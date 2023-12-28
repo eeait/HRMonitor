@@ -1,19 +1,27 @@
 import { useState, useEffect } from "react"
-import AccelerometerService from "./AccelerometerService"
+import { Accelerometer } from "expo-sensors"
 import DataStorage from "./dataStorage"
 
 const RecordingService = () => {
-  const { subscribe, unsubscribe } = AccelerometerService()
-
-  // eslint-disable-next-line no-unused-vars
   const [acceleration, setAcceleration] = useState({
     x: 0,
     y: 0,
     z: 0,
   })
-  const [recordedData, setRecordedData] = useState([])
-  const [shouldLogData, setShouldLogData] = useState(false)
   const [recording, setRecording] = useState(false)
+  const [recordedData, setRecordedData] = useState([])
+  const [shouldSave, setShouldSave] = useState(false)
+
+  const setUpdateIntervalAfterDelay = async (interval) => {
+    /* There's probably a bug in expo-sensors, and this is a workaround function.
+    Basically, if we just call setUpdateInterval in subscribe, it doesn't work.
+    What this function does is call setUpdateInterval after 1 millisecond. 
+    Not clean I think but this is how we do it now. */
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1)
+    })
+    Accelerometer.setUpdateInterval(interval)
+  }
 
   const listener = (data) => {
     setAcceleration(data)
@@ -28,20 +36,25 @@ const RecordingService = () => {
     })
   }
 
-  useEffect(() => {
-    subscribe(listener, 100)
-    return () => unsubscribe()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const subscribe = (interval) => {
+    Accelerometer.addListener(listener)
+    setUpdateIntervalAfterDelay(interval) // not immediately because it doesn't work, idk why.
+  }
+
+  const unsubscribe = () => {
+    Accelerometer.removeAllListeners()
+  }
 
   const stopRecording = () => {
+    unsubscribe()
     setRecording(false)
-    setShouldLogData(true)
+    setShouldSave(true)
     console.log("Recording stopped")
   }
 
   const startRecording = (duration) => {
     console.log(`Start recording: ${duration} ms`)
+    subscribe(1000)
     setRecordedData([])
     setRecording(true)
     setTimeout(() => {
@@ -50,11 +63,11 @@ const RecordingService = () => {
   }
 
   useEffect(() => {
-    if (shouldLogData) {
+    if (shouldSave) {
       const dataStorage = new DataStorage("accelerometerData")
       console.log("Trying to save data...")
       dataStorage
-        .saveData(recordedData) // Save the recordedData array
+        .addMeasurement(recordedData)
         .then(() => {
           console.log(
             `Data saved successfully. Recorded Data: ${JSON.stringify(
@@ -65,9 +78,9 @@ const RecordingService = () => {
         .catch((error) => {
           console.error(`Failed to save data: ${error}`)
         })
-      setShouldLogData(false) // Reset the flag
+      setShouldSave(false)
     }
-  }, [shouldLogData, recordedData])
+  }, [shouldSave, recordedData])
 
   return { acceleration, recording, startRecording }
 }

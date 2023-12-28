@@ -5,33 +5,26 @@ class DataStorage {
     this.namespace = namespace
   }
 
-  async saveData(data) {
-    try {
-      const stringifiedData = JSON.stringify(data)
-      await AsyncStorage.setItem(this.namespace, stringifiedData)
-    } catch (error) {
-      console.error("Failed to save data to storage", error)
-    }
+  async addMeasurement(newMeasurement) {
+    const currentData = await this.getMeasurements()
+    const newData = [...currentData, newMeasurement]
+
+    await AsyncStorage.setItem(
+      `${this.namespace}:measurement`,
+      JSON.stringify(newData)
+    )
   }
 
-  async getData() {
-    try {
-      const stringifiedData = await AsyncStorage.getItem(
-        this.namespace
-      )
-      return JSON.parse(stringifiedData)
-    } catch (error) {
-      console.error("Failed to get data from storage", error)
-      return null
-    }
+  async getMeasurements() {
+    const rawMeasurements = await AsyncStorage.getItem(
+      `${this.namespace}:measurement`
+    )
+    return rawMeasurements ? JSON.parse(rawMeasurements) : []
   }
 
-  async clearData() {
-    try {
-      await AsyncStorage.removeItem(this.namespace)
-    } catch (error) {
-      console.error("Failed to clear data from storage", error)
-    }
+  async clearMeasurements() {
+    console.log("CLEARING ALL")
+    await AsyncStorage.removeItem(`${this.namespace}:measurement`)
   }
 }
 
