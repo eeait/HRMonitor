@@ -19,9 +19,9 @@ const AccelerometerService = () => {
     setUpdateInterval(interval)
   }
 
-  const subscribe = (listener) => {
+  const subscribe = (listener, interval) => {
     setSubscription(Accelerometer.addListener(listener))
-    setUpdateIntervalAfterDelay(1000) // not immediately because it doesn't work, idk why.
+    setUpdateIntervalAfterDelay(interval) // not immediately because it doesn't work, idk why.
   }
 
   const unsubscribe = () => {

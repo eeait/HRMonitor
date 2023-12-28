@@ -2,9 +2,13 @@ import React from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 import styles from "./src/styles"
 import RecordingService from "./src/RecordingService"
+import DataList from "./src/components/DataList"
+import DataStorage from "./src/dataStorage"
 
 const App = () => {
-  const { acceleration, recording, startRecording } = RecordingService()
+  const { acceleration, recording, startRecording } =
+    RecordingService()
+  const dataStorage = new DataStorage("accelerometerData")
 
   const renderButton = (onPress, text, buttonStyle) => (
     <TouchableOpacity
@@ -25,14 +29,20 @@ const App = () => {
       <Text style={styles.text}>z: {acceleration.z}</Text>
       <View style={styles.buttonContainer}>
         {renderButton(
-          () => startRecording(5000),
+          () => startRecording(3000),
           "Record",
           styles.recordButton
+        )}
+        {renderButton(
+          dataStorage.clearData,
+          "Clear Data",
+          styles.clearButton
         )}
       </View>
       <Text style={styles.text}>
         {recording ? "RECORDING" : "Not recording"}
       </Text>
+      <DataList />
     </View>
   )
 }

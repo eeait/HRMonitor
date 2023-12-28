@@ -32,6 +32,9 @@ const styles = StyleSheet.create({
   recordButton: {
     backgroundColor: "#FF5733", // Choose your desired color
   },
+  clearButton: {
+    backgroundColor: "#FF5733"
+  }
 })
 
 export default styles

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import AccelerometerService from "./AccelerometerService"
+import DataStorage from "./dataStorage"
 
 const RecordingService = () => {
   const { subscribe, unsubscribe } = AccelerometerService()
@@ -18,7 +19,6 @@ const RecordingService = () => {
     setAcceleration(data)
     setRecording((prevRecording) => {
       if (prevRecording) {
-        console.log("Data being recorded: ", data)
         setRecordedData((prev) => [
           ...prev,
           { ...data, timestamp: Date.now() },
@@ -29,7 +29,7 @@ const RecordingService = () => {
   }
 
   useEffect(() => {
-    subscribe(listener)
+    subscribe(listener, 100)
     return () => unsubscribe()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -51,8 +51,20 @@ const RecordingService = () => {
 
   useEffect(() => {
     if (shouldLogData) {
-      console.log("Recorded Data:", recordedData)
-      // Save or process recordedData as needed
+      const dataStorage = new DataStorage("accelerometerData")
+      console.log("Trying to save data...")
+      dataStorage
+        .saveData(recordedData) // Save the recordedData array
+        .then(() => {
+          console.log(
+            `Data saved successfully. Recorded Data: ${JSON.stringify(
+              recordedData[0]
+            )} and ${recordedData.length - 1} more`
+          )
+        })
+        .catch((error) => {
+          console.error(`Failed to save data: ${error}`)
+        })
       setShouldLogData(false) // Reset the flag
     }
   }, [shouldLogData, recordedData])
