@@ -80,9 +80,9 @@ const RecordingService = () => {
         })
       setShouldSave(false)
     }
-  }, [shouldSave, recordedData])
+  }, [shouldSave])
 
-  return { acceleration, recording, startRecording }
+  return { recording, startRecording }
 }
 
 export default RecordingService

@@ -39,25 +39,12 @@ const styles = StyleSheet.create({
 })
 
 const Accelerometer = ({ setRefresh }) => {
-  const { acceleration, recording, startRecording } =
-    RecordingService()
+  const { recording, startRecording } = RecordingService()
   const dataStorage = new DataStorage("accelerometerData")
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Acceleration (g):</Text>
-      <View style={styles.dataContainer}>
-        <Text style={styles.data}>
-          x: {Number(acceleration.x).toFixed(5)}
-        </Text>
-        <Text style={styles.data}>
-          y: {Number(acceleration.y).toFixed(5)}
-        </Text>
-        <Text style={styles.data}>
-          z: {Number(acceleration.z).toFixed(5)}
-        </Text>
-      </View>
-
+      <Text style={styles.title}>Measure Acceleration</Text>
       <Button
         style={[
           recording
