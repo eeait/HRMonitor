@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, ScrollView, StyleSheet } from "react-native"
+import {
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native"
 import DataStorage from "../dataStorage"
 
 const styles = StyleSheet.create({
@@ -8,18 +13,17 @@ const styles = StyleSheet.create({
   },
   item: {
     backgroundColor: "#FFFFFF",
-    padding: 10, // Reduced padding to make items slimmer
+    padding: 10,
     marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 10,
-    // Removed shadow properties
   },
   text: {
     fontSize: 16,
   },
 })
 
-const MeasurementList = () => {
+const MeasurementList = ({ navigation }) => {
   const [data, setData] = useState([])
   const dataStorage = new DataStorage("accelerometerData")
 
@@ -40,13 +44,17 @@ const MeasurementList = () => {
   return (
     <ScrollView style={styles.scrollView}>
       {data.map((item) => (
-        <View key={item[0].timestamp} style={styles.item}>
+        <TouchableOpacity
+          key={item[0].timestamp}
+          style={styles.item}
+          onPress={() => navigation.navigate("Measurement", { item })}
+        >
           <Text style={styles.text}>
             {`Measurement on ${new Date(
               item[0].timestamp
             ).toLocaleString()}`}
           </Text>
-        </View>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   )

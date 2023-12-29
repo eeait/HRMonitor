@@ -1,34 +1,21 @@
-import React, { useState } from "react"
-import { SafeAreaView, StyleSheet, View } from "react-native"
-import MeasurementList from "./src/components/MeasurementList"
-import Accelerometer from "./src/components/Accelerometer"
+import React from "react"
+import { SafeAreaView } from "react-native"
+import { NavigationContainer } from "@react-navigation/native"
+import { createStackNavigator } from "@react-navigation/stack"
+import Main from "./src/components/Main"
+import Measurement from "./src/components/Measurement"
 
-const styles = StyleSheet.create({
-  flexContainer: {
-    backgroundColor: "#F5F5F5",
-    flex: 1
-  },
-  accelerometerContainer: {
-    flex: 2
-  },
-  listContainer: {
-    flex: 3,
-  },
-})
+const Stack = createStackNavigator()
 
-const App = () => {
-  const [refresh, setRefresh] = useState(0)
-
-  return (
-    <SafeAreaView style={styles.flexContainer}>
-      <View style={styles.accelerometerContainer}>
-        <Accelerometer setRefresh={setRefresh} />
-      </View>
-      <View style={styles.listContainer}>
-        <MeasurementList key={refresh} />
-      </View>
-    </SafeAreaView>
-  )
-}
+const App = () => (
+  <SafeAreaView style={{ flex: 1 }}>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Main" component={Main} />
+        <Stack.Screen name="Measurement" component={Measurement} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  </SafeAreaView>
+)
 
 export default App
