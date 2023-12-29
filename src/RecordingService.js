@@ -1,21 +1,17 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Accelerometer } from "expo-sensors"
 import DataStorage from "./dataStorage"
 import { SUBSCRIBE_INTERVAL } from "./components/constants"
 
 const RecordingService = () => {
-  const [acceleration, setAcceleration] = useState({
-    x: 0,
-    y: 0,
-    z: 0,
-  })
   const [recording, setRecording] = useState(false)
   const [recordedData, setRecordedData] = useState([])
   const [shouldSave, setShouldSave] = useState(false)
+  const batch = useRef([])
 
   const setUpdateIntervalAfterDelay = async (interval) => {
-    /* There's probably a bug in expo-sensors, and this is a workaround function.
-    Basically, if we just call setUpdateInterval in subscribe, it doesn't work.
+    /* There might be a bug in expo-sensors, and this is a workaround function.
+    Basically, if we just call setUpdateInterval inside subscribe, it doesn't work.
     What this function does is call setUpdateInterval after 1 millisecond. 
     Not clean I think but this is how we do it now. */
     await new Promise((resolve) => {
@@ -24,22 +20,33 @@ const RecordingService = () => {
     Accelerometer.setUpdateInterval(interval)
   }
 
+  // Listener function for accelerometer
   const listener = (data) => {
-    setAcceleration(data)
     setRecording((prevRecording) => {
       if (prevRecording) {
-        setRecordedData((prev) => [
-          ...prev,
-          { ...data, timestamp: Date.now() },
-        ])
+        // Implement batching
+        batch.current.push({ ...data, timestamp: Date.now() })
+        if (batch.current.length >= 20) {
+          setRecordedData((prev) => [...prev, ...batch.current])
+          batch.current = []
+        }
       }
       return prevRecording
     })
   }
 
+  // Make sure to save data that is left in batch when recording stops
+  useEffect(() => {
+    if (!recording && batch.current.length > 0) {
+      setRecordedData((prev) => [...prev, ...batch.current])
+      batch.current = []
+    }
+  }, [recording])
+
   const subscribe = (interval) => {
     Accelerometer.addListener(listener)
-    setUpdateIntervalAfterDelay(interval) // not immediately because it doesn't work, idk why.
+    setUpdateIntervalAfterDelay(interval)
+    // not immediately because it doesn't work, idk why.
   }
 
   const unsubscribe = () => {
@@ -58,6 +65,7 @@ const RecordingService = () => {
     subscribe(SUBSCRIBE_INTERVAL)
     setRecordedData([])
     setRecording(true)
+    // Stop recording after duration
     setTimeout(() => {
       stopRecording()
     }, duration)
@@ -80,6 +88,7 @@ const RecordingService = () => {
         })
       setShouldSave(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldSave])
 
   return { recording, startRecording }

@@ -43,19 +43,23 @@ const MeasurementList = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.scrollView}>
-      {timestamps.map((timestamp) => (
-        <TouchableOpacity
-          key={timestamp}
-          style={styles.item}
-          onPress={() =>
-            navigation.navigate("Measurement", { item: timestamp })
-          }
-        >
-          <Text style={styles.text}>
-            {`Measurement on ${new Date(timestamp).toLocaleString()}`}
-          </Text>
-        </TouchableOpacity>
-      ))}
+      {timestamps
+        .sort((a, b) => b - a)
+        .map((timestamp) => (
+          <TouchableOpacity
+            key={timestamp}
+            style={styles.item}
+            onPress={() =>
+              navigation.navigate("Measurement", { item: timestamp })
+            }
+          >
+            <Text style={styles.text}>
+              {`Measurement on ${new Date(
+                timestamp
+              ).toLocaleString()}`}
+            </Text>
+          </TouchableOpacity>
+        ))}
     </ScrollView>
   )
 }
