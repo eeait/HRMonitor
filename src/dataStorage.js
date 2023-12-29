@@ -1,30 +1,41 @@
+/* eslint-disable class-methods-use-this */
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 class DataStorage {
-  constructor(namespace = "data") {
+  constructor(namespace = "measurement") {
     this.namespace = namespace
   }
 
   async addMeasurement(newMeasurement) {
-    const currentData = await this.getMeasurements()
-    const newData = [...currentData, newMeasurement]
-
     await AsyncStorage.setItem(
-      `${this.namespace}:measurement`,
-      JSON.stringify(newData)
+      `${newMeasurement[0].timestamp}`,
+      JSON.stringify(newMeasurement)
     )
   }
 
+  async getMeasurement(timestamp) {
+    const rawMeasurement = await AsyncStorage.getItem(timestamp)
+    return JSON.parse(rawMeasurement)
+  }
+
   async getMeasurements() {
-    const rawMeasurements = await AsyncStorage.getItem(
-      `${this.namespace}:measurement`
-    )
-    return rawMeasurements ? JSON.parse(rawMeasurements) : []
+    const keys = await AsyncStorage.getAllKeys()
+    const rawMeasurements = await AsyncStorage.multiGet(keys)
+    return rawMeasurements.map(([, value]) => JSON.parse(value))
+  }
+
+  async getKeys() {
+    const keys = await AsyncStorage.getAllKeys()
+    return keys
+  }
+
+  async removeMeasurement(timestamp) {
+    await AsyncStorage.removeItem(`${timestamp}`)
   }
 
   async clearMeasurements() {
     console.log("CLEARING ALL")
-    await AsyncStorage.removeItem(`${this.namespace}:measurement`)
+    await AsyncStorage.clear()
   }
 }
 

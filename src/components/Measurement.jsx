@@ -1,15 +1,62 @@
-import React from "react"
-import { View, Text } from "react-native"
+import React, { useEffect } from "react"
+import { View, Text, StyleSheet } from "react-native"
+import DataStorage from "../dataStorage"
+import Button from "./Button"
 
-const Measurement = ({ route }) => {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  buttonRed: {
+    backgroundColor: "red",
+  },
+})
+
+const Measurement = ({ route, navigation }) => {
   const { item } = route.params
+  const dataStorage = new DataStorage("accelerometerData")
+  const [recording, setRecording] = React.useState([
+    { x: 0, y: 0, z: 0, timestamp: 0 },
+  ])
+
+  useEffect(() => {
+    dataStorage
+      .getMeasurement(String(item))
+      .then((measurement) => {
+        if (measurement !== null) {
+          setRecording(measurement)
+        } else {
+          console.log("No measurement found for timestamp:", item)
+        }
+      })
+      .catch((error) => {
+        console.error(`Failed to retrieve data: ${error}`)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const removeMeasurement = async () => {
+    await dataStorage.removeMeasurement(item)
+    navigation.goBack()
+  }
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text>{`Measurement on ${new Date(
-        item[0].timestamp
+        item
       ).toLocaleString()}`}</Text>
-      <Text>And other data</Text>
+      <Text>
+        {`X: ${recording[0].x},`}
+        {`\nY: ${recording[0].y},`}
+        {`\nZ: ${recording[0].z},`}
+        {`\nTimestamp: ${recording[0].timestamp}`}
+      </Text>
+      <Button
+        title="Remove Measurement"
+        onPress={removeMeasurement}
+        style={styles.buttonRed}
+      />
     </View>
   )
 }

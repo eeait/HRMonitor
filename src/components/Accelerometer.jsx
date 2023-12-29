@@ -1,11 +1,7 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native"
+import { View, Text, StyleSheet } from "react-native"
 import RecordingService from "../RecordingService"
 import DataStorage from "../dataStorage"
+import Button from "./Button"
 
 const styles = StyleSheet.create({
   container: {
@@ -24,12 +20,6 @@ const styles = StyleSheet.create({
   data: {
     fontSize: 18,
     marginBottom: 10,
-  },
-  button: {
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-    backgroundColor: "blue",
   },
   buttonRecording: {
     backgroundColor: "gray",
@@ -67,33 +57,28 @@ const Accelerometer = ({ setRefresh }) => {
         </Text>
       </View>
 
-      <TouchableOpacity
+      <Button
         style={[
-          styles.button,
           recording
             ? styles.buttonRecording
             : styles.buttonNotRecording,
         ]}
         onPress={() => startRecording(3000)}
         disabled={recording}
-      >
-        <Text style={styles.buttonText}>Record</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
+        title="Record"
+      />
+      <Button
         onPress={() => setRefresh(Date.now())}
-      >
-        <Text style={styles.buttonText}>Refresh</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.button, styles.buttonClear]}
+        title="Refresh"
+      />
+      <Button
+        style={styles.buttonClear}
         onPress={() => {
           dataStorage.clearMeasurements()
           setRefresh(Date.now())
         }}
-      >
-        <Text style={styles.buttonText}>Clear</Text>
-      </TouchableOpacity>
+        title="Clear"
+      />
     </View>
   )
 }

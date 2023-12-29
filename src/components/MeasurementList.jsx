@@ -24,15 +24,15 @@ const styles = StyleSheet.create({
 })
 
 const MeasurementList = ({ navigation }) => {
-  const [data, setData] = useState([])
+  const [timestamps, setTimestamps] = useState([])
   const dataStorage = new DataStorage("accelerometerData")
 
   useEffect(() => {
     dataStorage
-      .getMeasurements()
-      .then((retrievedData) => {
-        if (retrievedData) {
-          setData(retrievedData)
+      .getKeys()
+      .then((keys) => {
+        if (keys) {
+          setTimestamps(keys.map((key) => Number(key)))
         }
       })
       .catch((error) => {
@@ -43,16 +43,16 @@ const MeasurementList = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.scrollView}>
-      {data.map((item) => (
+      {timestamps.map((timestamp) => (
         <TouchableOpacity
-          key={item[0].timestamp}
+          key={timestamp}
           style={styles.item}
-          onPress={() => navigation.navigate("Measurement", { item })}
+          onPress={() =>
+            navigation.navigate("Measurement", { item: timestamp })
+          }
         >
           <Text style={styles.text}>
-            {`Measurement on ${new Date(
-              item[0].timestamp
-            ).toLocaleString()}`}
+            {`Measurement on ${new Date(timestamp).toLocaleString()}`}
           </Text>
         </TouchableOpacity>
       ))}

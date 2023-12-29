@@ -65,7 +65,6 @@ const RecordingService = () => {
   useEffect(() => {
     if (shouldSave) {
       const dataStorage = new DataStorage("accelerometerData")
-      console.log("Trying to save data...")
       dataStorage
         .addMeasurement(recordedData)
         .then(() => {
