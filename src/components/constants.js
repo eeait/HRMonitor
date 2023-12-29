@@ -1,0 +1,2 @@
+export const SUBSCRIBE_INTERVAL = 16
+export const RECORDING_DURATION = 1000

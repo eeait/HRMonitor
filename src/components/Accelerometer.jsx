@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from "react-native"
 import RecordingService from "../RecordingService"
 import DataStorage from "../dataStorage"
 import Button from "./Button"
+import { RECORDING_DURATION } from "./constants"
 
 const styles = StyleSheet.create({
   container: {
@@ -63,7 +64,7 @@ const Accelerometer = ({ setRefresh }) => {
             ? styles.buttonRecording
             : styles.buttonNotRecording,
         ]}
-        onPress={() => startRecording(3000)}
+        onPress={() => startRecording(RECORDING_DURATION)}
         disabled={recording}
         title="Record"
       />

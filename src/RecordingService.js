@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Accelerometer } from "expo-sensors"
 import DataStorage from "./dataStorage"
+import { SUBSCRIBE_INTERVAL } from "./components/constants"
 
 const RecordingService = () => {
   const [acceleration, setAcceleration] = useState({
@@ -54,7 +55,7 @@ const RecordingService = () => {
 
   const startRecording = (duration) => {
     console.log(`Start recording: ${duration} ms`)
-    subscribe(1000)
+    subscribe(SUBSCRIBE_INTERVAL)
     setRecordedData([])
     setRecording(true)
     setTimeout(() => {
