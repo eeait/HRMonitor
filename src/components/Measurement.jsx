@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import { View, Text, StyleSheet } from "react-native"
 import DataStorage from "../dataStorage"
 import Button from "./Button"
+import { logCsv } from "../../utils"
 
 const styles = StyleSheet.create({
   container: {
@@ -57,6 +58,7 @@ const Measurement = ({ route, navigation }) => {
         onPress={removeMeasurement}
         style={styles.buttonRed}
       />
+      <Button title="Log data" onPress={() => logCsv(recording)} />
     </View>
   )
 }
