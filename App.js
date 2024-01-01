@@ -11,8 +11,16 @@ const App = () => (
   <SafeAreaView style={{ flex: 1 }}>
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Main" component={Main} />
-        <Stack.Screen name="Measurement" component={Measurement} />
+        <Stack.Screen
+          name="Main"
+          component={Main}
+          options={{ headerShown: false }} // Add this line
+        />
+        <Stack.Screen
+          name="Measurement"
+          component={Measurement}
+          options={{ title: "Measurement Details" }} // And this line
+        />
       </Stack.Navigator>
     </NavigationContainer>
   </SafeAreaView>

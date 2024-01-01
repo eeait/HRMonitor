@@ -9,10 +9,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   accelerometerContainer: {
-    flex: 2,
+    flex: 0,
   },
   listContainer: {
-    flex: 5,
+    flex: 1,
   },
 })
 

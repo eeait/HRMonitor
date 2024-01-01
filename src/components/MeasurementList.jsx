@@ -22,6 +22,10 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
   },
+  centeredText: {
+    textAlign: "center", // Center the text horizontally
+    marginTop: "50%", // Push the text down to the middle of the container
+  },
 })
 
 const MeasurementList = ({ navigation }) => {
@@ -76,25 +80,31 @@ const MeasurementList = ({ navigation }) => {
   return (
     <DataStorageContext.Provider value={contextValue}>
       <ScrollView style={styles.scrollView}>
-        {measurements
-          .sort((a, b) => b - a)
-          .map((measurement) => (
-            <TouchableOpacity
-              key={measurement}
-              style={styles.item}
-              onPress={() =>
-                navigation.navigate("Measurement", {
-                  item: measurement,
-                })
-              }
-            >
-              <Text style={styles.text}>
-                {`Measurement on ${new Date(
-                  measurement
-                ).toLocaleString()}`}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        {measurements.length > 0 ? (
+          measurements
+            .sort((a, b) => b - a)
+            .map((measurement) => (
+              <TouchableOpacity
+                key={measurement}
+                style={styles.item}
+                onPress={() =>
+                  navigation.navigate("Measurement", {
+                    item: measurement,
+                  })
+                }
+              >
+                <Text style={styles.text}>
+                  {`Measurement on ${new Date(
+                    measurement
+                  ).toLocaleString()}`}
+                </Text>
+              </TouchableOpacity>
+            ))
+        ) : (
+          <Text style={styles.centeredText}>
+            No measurements available
+          </Text>
+        )}
       </ScrollView>
     </DataStorageContext.Provider>
   )
