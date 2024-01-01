@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Accelerometer } from "expo-sensors"
 import DataStorage from "./dataStorage"
-import { SUBSCRIBE_INTERVAL } from "./components/constants"
+import { SUBSCRIBE_INTERVAL } from "./constants"
 
 const RecordingService = () => {
   const [recording, setRecording] = useState(false)

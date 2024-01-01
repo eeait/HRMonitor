@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native"
-import { useState } from "react"
+import React from "react"
 import MeasurementList from "./MeasurementList"
 import Accelerometer from "./Accelerometer"
 
@@ -9,26 +9,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   accelerometerContainer: {
-    flex: 4,
+    flex: 2,
   },
   listContainer: {
-    flex: 7,
+    flex: 5,
   },
 })
 
-const Main = ({ navigation }) => {
-  const [refresh, setRefresh] = useState(0)
+const Main = ({ navigation }) => (
+  // const [refresh, setRefresh] = useState(0)
 
-  return (
-    <View style={styles.flexContainer}>
-      <View style={styles.accelerometerContainer}>
-        <Accelerometer setRefresh={setRefresh} />
-      </View>
-      <View style={styles.listContainer}>
-        <MeasurementList key={refresh} navigation={navigation} />
-      </View>
+  // const handleRefresh = (newRefresh) => {
+  //   setRefresh(newRefresh)
+  //   console.log("refreshed")
+  // }
+
+  <View style={styles.flexContainer}>
+    <View style={styles.accelerometerContainer}>
+      <Accelerometer />
     </View>
-  )
-}
+    <View style={styles.listContainer}>
+      <MeasurementList navigation={navigation} />
+    </View>
+  </View>
+)
 
 export default Main

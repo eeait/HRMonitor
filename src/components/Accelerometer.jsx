@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native"
 import RecordingService from "../RecordingService"
 import DataStorage from "../dataStorage"
 import Button from "./Button"
-import { RECORDING_DURATION } from "./constants"
+import { RECORDING_DURATION } from "../constants"
 
 const styles = StyleSheet.create({
   container: {
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   },
 })
 
-const Accelerometer = ({ setRefresh }) => {
+const Accelerometer = () => {
   const { recording, startRecording } = RecordingService()
   const dataStorage = new DataStorage("accelerometerData")
 
@@ -56,14 +56,10 @@ const Accelerometer = ({ setRefresh }) => {
         title="Record"
       />
       <Button
-        onPress={() => setRefresh(Date.now())}
-        title="Refresh"
-      />
-      <Button
         style={styles.buttonClear}
         onPress={() => {
           dataStorage.clearMeasurements()
-          setRefresh(Date.now())
+          // handleRefresh(Date.now())
         }}
         title="Clear"
       />

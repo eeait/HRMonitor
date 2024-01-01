@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import {
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
 } from "react-native"
+import DataStorageContext from "../dataStorageContext"
 import DataStorage from "../dataStorage"
 
 const styles = StyleSheet.create({
@@ -24,43 +25,78 @@ const styles = StyleSheet.create({
 })
 
 const MeasurementList = ({ navigation }) => {
-  const [timestamps, setTimestamps] = useState([])
   const dataStorage = new DataStorage("accelerometerData")
+  const [measurements, setMeasurements] = useState([])
 
-  useEffect(() => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const updateMeasurements = async () => {
     dataStorage
       .getKeys()
       .then((keys) => {
         if (keys) {
-          setTimestamps(keys.map((key) => Number(key)))
+          setMeasurements(keys.map((key) => Number(key)))
         }
       })
       .catch((error) => {
         console.error(`Failed to retrieve data: ${error}`)
       })
+  }
+
+  useEffect(() => {
+    updateMeasurements()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    dataStorage.onMeasurementAdded = (newMeasurement) => {
+      setMeasurements((prevMeasurements) => [
+        ...prevMeasurements,
+        Number(newMeasurement[0].timestamp),
+      ])
+    }
+    dataStorage.onMeasurementRemoved = (removedMeasurement) => {
+      console.log("Measurement removed in ML:", removedMeasurement)
+      setMeasurements((prevMeasurements) =>
+        prevMeasurements.filter(
+          (measurement) => measurement !== removedMeasurement
+        )
+      )
+    }
+    dataStorage.onClearMeasurements = () => {
+      setMeasurements([])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const contextValue = useMemo(
+    () => ({ measurements, updateMeasurements }),
+    [measurements, updateMeasurements]
+  )
+
   return (
-    <ScrollView style={styles.scrollView}>
-      {timestamps
-        .sort((a, b) => b - a)
-        .map((timestamp) => (
-          <TouchableOpacity
-            key={timestamp}
-            style={styles.item}
-            onPress={() =>
-              navigation.navigate("Measurement", { item: timestamp })
-            }
-          >
-            <Text style={styles.text}>
-              {`Measurement on ${new Date(
-                timestamp
-              ).toLocaleString()}`}
-            </Text>
-          </TouchableOpacity>
-        ))}
-    </ScrollView>
+    <DataStorageContext.Provider value={contextValue}>
+      <ScrollView style={styles.scrollView}>
+        {measurements
+          .sort((a, b) => b - a)
+          .map((measurement) => (
+            <TouchableOpacity
+              key={measurement}
+              style={styles.item}
+              onPress={() =>
+                navigation.navigate("Measurement", {
+                  item: measurement,
+                })
+              }
+            >
+              <Text style={styles.text}>
+                {`Measurement on ${new Date(
+                  measurement
+                ).toLocaleString()}`}
+              </Text>
+            </TouchableOpacity>
+          ))}
+      </ScrollView>
+    </DataStorageContext.Provider>
   )
 }
 

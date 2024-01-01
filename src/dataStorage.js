@@ -2,8 +2,21 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 class DataStorage {
+  static instance = null
+
   constructor(namespace = "measurement") {
+    if (DataStorage.instance) {
+      // eslint-disable-next-line no-constructor-return
+      return DataStorage.instance
+    }
+
     this.namespace = namespace
+
+    this.onMeasurementAdded = null
+    this.onMeasurementRemoved = null
+    this.onClearMeasurements = null
+
+    DataStorage.instance = this
   }
 
   async addMeasurement(newMeasurement) {
@@ -11,6 +24,10 @@ class DataStorage {
       `${newMeasurement[0].timestamp}`,
       JSON.stringify(newMeasurement)
     )
+
+    if (this.onMeasurementAdded) {
+      this.onMeasurementAdded(newMeasurement)
+    }
   }
 
   async getMeasurement(timestamp) {
@@ -31,11 +48,19 @@ class DataStorage {
 
   async removeMeasurement(timestamp) {
     await AsyncStorage.removeItem(`${timestamp}`)
+
+    if (this.onMeasurementRemoved) {
+      this.onMeasurementRemoved(timestamp)
+    }
   }
 
   async clearMeasurements() {
     console.log("CLEARING ALL")
     await AsyncStorage.clear()
+
+    if (this.onClearMeasurements) {
+      this.onClearMeasurements()
+    }
   }
 }
 
