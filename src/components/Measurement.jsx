@@ -2,8 +2,8 @@ import React, { useEffect } from "react"
 import { View, Text, StyleSheet } from "react-native"
 import DataStorage from "../dataStorage"
 import Button from "./Button"
-import { logCsv } from "../../utils"
 import DataView from "./DataView"
+import { replaceXYZWithTotal } from "../utils/mathUtils"
 
 const styles = StyleSheet.create({
   container: {
@@ -19,7 +19,7 @@ const Measurement = ({ route, navigation }) => {
   const { item } = route.params
   const dataStorage = new DataStorage("accelerometerData")
   const [recording, setRecording] = React.useState([
-    { x: 0, y: 0, z: 0, timestamp: 0 },
+    { timestamp: 0, totalAcceleration: 0 },
   ])
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const Measurement = ({ route, navigation }) => {
       .getMeasurement(String(item))
       .then((measurement) => {
         if (measurement !== null) {
-          setRecording(measurement)
+          setRecording(replaceXYZWithTotal(measurement))
         } else {
           console.log("No measurement found for timestamp:", item)
         }
@@ -48,18 +48,11 @@ const Measurement = ({ route, navigation }) => {
       <Text>{`Measurement on ${new Date(
         item
       ).toLocaleString()}`}</Text>
-      <Text>
-        {`X: ${recording[0].x},`}
-        {`\nY: ${recording[0].y},`}
-        {`\nZ: ${recording[0].z},`}
-        {`\nTimestamp: ${recording[0].timestamp}`}
-      </Text>
       <Button
         title="Remove Measurement"
         onPress={removeMeasurement}
         style={styles.buttonRed}
       />
-      <Button title="Log data" onPress={() => logCsv(recording)} />
       <DataView recording={recording} />
     </View>
   )

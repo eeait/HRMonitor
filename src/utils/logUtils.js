@@ -23,6 +23,4 @@ const logCsv = (recording) => {
   console.log(`${headers}\n${csvData.join("\n")}`)
 }
 
-module.exports = {
-  logCsv,
-}
+export default logCsv
