@@ -1,15 +1,16 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { Accelerometer } from "expo-sensors"
 import DataStorage from "./dataStorage"
-import { SUBSCRIBE_INTERVAL } from "./constants"
 
 const RecordingService = () => {
   const [recording, setRecording] = useState(false)
   const [recordedData, setRecordedData] = useState([])
   const [shouldSave, setShouldSave] = useState(false)
-  const batch = useRef([])
 
-  const setUpdateIntervalAfterDelay = async (interval) => {
+  const interval = 10 // ms, 10 is the minimum
+  const duration = 10000 // ms
+
+  const setUpdateIntervalAfterDelay = async (updateInterval) => {
     /* There might be a bug in expo-sensors, and this is a workaround function.
     Basically, if we just call setUpdateInterval inside subscribe, it doesn't work.
     What this function does is call setUpdateInterval after 1 millisecond. 
@@ -17,35 +18,25 @@ const RecordingService = () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 1)
     })
-    Accelerometer.setUpdateInterval(interval)
+    Accelerometer.setUpdateInterval(updateInterval)
   }
 
   // Listener function for accelerometer
   const listener = (data) => {
     setRecording((prevRecording) => {
       if (prevRecording) {
-        // Implement batching
-        batch.current.push({ ...data, timestamp: Date.now() })
-        if (batch.current.length >= 20) {
-          setRecordedData((prev) => [...prev, ...batch.current])
-          batch.current = []
-        }
+        setRecordedData((prev) => [
+          ...prev,
+          { ...data, timestamp: Date.now() },
+        ])
       }
       return prevRecording
     })
   }
 
-  // Make sure to save data that is left in batch when recording stops
-  useEffect(() => {
-    if (!recording && batch.current.length > 0) {
-      setRecordedData((prev) => [...prev, ...batch.current])
-      batch.current = []
-    }
-  }, [recording])
-
-  const subscribe = (interval) => {
+  const subscribe = (updateInterval) => {
     Accelerometer.addListener(listener)
-    setUpdateIntervalAfterDelay(interval)
+    setUpdateIntervalAfterDelay(updateInterval)
     // not immediately because it doesn't work, idk why.
   }
 
@@ -60,9 +51,9 @@ const RecordingService = () => {
     console.log("Recording stopped")
   }
 
-  const startRecording = (duration) => {
+  const startRecording = () => {
     console.log(`Start recording: ${duration} ms`)
-    subscribe(SUBSCRIBE_INTERVAL)
+    subscribe(interval)
     setRecordedData([])
     setRecording(true)
     // Stop recording after duration
@@ -74,6 +65,7 @@ const RecordingService = () => {
   useEffect(() => {
     if (shouldSave) {
       const dataStorage = new DataStorage("accelerometerData")
+      console.log("recordedData: ", recordedData)
       dataStorage
         .addMeasurement(recordedData)
         .then(() => {

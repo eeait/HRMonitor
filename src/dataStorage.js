@@ -20,6 +20,7 @@ class DataStorage {
   }
 
   async addMeasurement(newMeasurement) {
+    console.log("newMeasurement: ", newMeasurement)
     await AsyncStorage.setItem(
       `${newMeasurement[0].timestamp}`,
       JSON.stringify(newMeasurement)

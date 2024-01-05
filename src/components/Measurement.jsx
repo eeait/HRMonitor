@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native"
 import DataStorage from "../dataStorage"
 import Button from "./Button"
 import { logCsv } from "../../utils"
+import DataView from "./DataView"
 
 const styles = StyleSheet.create({
   container: {
@@ -59,6 +60,7 @@ const Measurement = ({ route, navigation }) => {
         style={styles.buttonRed}
       />
       <Button title="Log data" onPress={() => logCsv(recording)} />
+      <DataView recording={recording} />
     </View>
   )
 }
