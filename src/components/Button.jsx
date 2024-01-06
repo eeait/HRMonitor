@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
   },
 })
 
+// A button element to be used across the app
 const Button = ({ style, onPress, disabled, title }) => (
   <TouchableOpacity
     style={[styles.button, style]}

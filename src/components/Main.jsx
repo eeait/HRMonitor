@@ -17,13 +17,6 @@ const styles = StyleSheet.create({
 })
 
 const Main = ({ navigation }) => (
-  // const [refresh, setRefresh] = useState(0)
-
-  // const handleRefresh = (newRefresh) => {
-  //   setRefresh(newRefresh)
-  //   console.log("refreshed")
-  // }
-
   <View style={styles.flexContainer}>
     <View style={styles.accelerometerContainer}>
       <Accelerometer />
@@ -33,5 +26,4 @@ const Main = ({ navigation }) => (
     </View>
   </View>
 )
-
 export default Main

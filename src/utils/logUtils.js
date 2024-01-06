@@ -1,3 +1,8 @@
+// This file contains helper functions to log data in CSV format.
+// These are used in development to log raw sensor data to the console.
+// Mainly because it's easier to copy and paste from the console
+// than to configure a debugger that can access asyncStorage. (I tried.)
+
 // Helper function to calculate total
 const calculateTotal = (row) =>
   Math.sqrt(row.x ** 2 + row.y ** 2 + row.z ** 2)

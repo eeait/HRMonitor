@@ -9,9 +9,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    justifyContent: "space-between",
   },
   buttonRed: {
     backgroundColor: "red",
+    width: "100%",
+  },
+  text: {
+    marginTop: 20,
+    fontSize: 18,
+    textAlign: "center",
   },
 })
 
@@ -45,15 +52,17 @@ const Measurement = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text>{`Measurement on ${new Date(
+      <DataView recording={recording} />
+      <Text style={styles.text}>{`Measured on ${new Date(
         item
       ).toLocaleString()}`}</Text>
-      <Button
-        title="Remove Measurement"
-        onPress={removeMeasurement}
-        style={styles.buttonRed}
-      />
-      <DataView recording={recording} />
+      <View style={{ flexDirection: "column-reverse" }}>
+        <Button
+          title="Delete Measurement"
+          onPress={removeMeasurement}
+          style={styles.buttonRed}
+        />
+      </View>
     </View>
   )
 }

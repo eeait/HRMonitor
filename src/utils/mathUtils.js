@@ -1,5 +1,7 @@
 import { fft } from "fft-js"
 
+// The following functions are used to analyze the data
+
 // Calculates the total acceleration from the x, y, and z components
 export const calculateTotalAcceleration = (x, y, z) =>
   Math.sqrt(x * x + y * y + z * z)

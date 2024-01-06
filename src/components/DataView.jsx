@@ -1,101 +1,79 @@
-import { useEffect, useState } from "react"
-import { Text, View } from "react-native"
+import { View, StyleSheet, Text } from "react-native"
+import { Chart, Line } from "react-native-responsive-linechart"
+import { useMemo } from "react"
 import {
-  Chart,
-  Line,
-  VerticalAxis,
-  HorizontalAxis,
-} from "react-native-responsive-linechart"
-import {
-  calculateFFT,
   calculateHeartFrequency,
   calculateMovingAverage,
   adjustTimestamps,
 } from "../utils/mathUtils"
+import BeatingHeart from "./BeatingHeart"
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  bpmText: {
+    textAlign: "center",
+    fontSize: 36,
+  },
+  chart: {
+    height: 100,
+    width: "100%",
+  },
+})
 
 const DataView = ({ recording }) => {
-  const [chartData, setChartData] = useState([{ x: 0, y: 0 }])
-  const [fftData, setFftData] = useState([{ x: 0, y: 0 }])
-  const [heartFrequency, setHeartFrequency] = useState(0)
+  // Process and filter the data to only include every 10th point,
+  // for a smoother chart
+  const chartData = calculateMovingAverage(
+    adjustTimestamps(recording)
+  ).filter((_, index) => index % 10 === 0)
 
-  useEffect(() => {
-    if (recording && recording.length > 0) {
-      const movingAverageData = calculateMovingAverage(
-        adjustTimestamps(recording)
-      )
-      setChartData(movingAverageData)
+  // This is a lot of work, so it's only done once
+  const heartFrequency = useMemo(
+    () => calculateHeartFrequency(recording),
+    [recording]
+  )
 
-      const fftResult = calculateFFT(movingAverageData, 100)
-      setFftData(fftResult)
-
-      setHeartFrequency(calculateHeartFrequency(recording))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recording])
-
+  // Calculate the domain for the chart
   const xValues = chartData.map((point) => point.x)
   const yValues = chartData.map((point) => point.y)
+  const xMin = Math.min(...xValues)
+  const xMax = Math.max(...xValues)
+  const yMin = Math.min(...yValues)
+  const yMax = Math.max(...yValues)
+  const yRange = yMax - yMin
 
   const xDomain = {
-    min: Math.min(...xValues),
-    max: Math.max(...xValues),
+    min: xMin,
+    max: xMax,
   }
   const yDomain = {
-    min: Math.min(...yValues),
-    max: Math.max(...yValues),
+    min: yMin - 0.1 * yRange,
+    max: yMax + 0.1 * yRange,
   }
 
   return (
-    <View>
-      <Text>{Math.round(heartFrequency * 60)} bpm</Text>
-      {chartData.length > 1 && (
-        <Chart
-          style={{
-            height: 200,
-            width: "100%",
-          }}
-          xDomain={xDomain}
-          yDomain={yDomain}
-          padding={{ left: 40, top: 30, bottom: 30, right: 40 }}
-        >
-          <Line
-            data={chartData}
-            smoothing="none"
-            theme={{ stroke: { color: "red", width: 1 } }}
-          />
-          <VerticalAxis tickValues={[0.95, 1, 1.05]} />
-          <HorizontalAxis tickCount={3} />
-        </Chart>
-      )}
-      {fftData.length > 1 && (
-        <Chart
-          style={{
-            height: 200,
-            width: "100%",
-          }}
-          // xDomain={{ min: 0, max: 5 }}
-          // yDomain={{ min: 0, max: 0.01 }}
-          xDomain={{
-            min: Math.min(...fftData.map((point) => point.x)),
-            max: Math.max(...fftData.map((point) => point.x)) / 40,
-          }}
-          yDomain={{
-            min: Math.min(...fftData.map((point) => point.y)),
-            max: Math.max(...fftData.map((point) => point.y)),
-          }}
-          padding={{ left: 40, top: 30, bottom: 30, right: 40 }}
-        >
-          <Line
-            data={fftData}
-            smoothing="none"
-            theme={{ stroke: { color: "blue", width: 1 } }}
-          />
-          <HorizontalAxis
-            tickCount={5}
-            tickValues={[heartFrequency]}
-          />
-        </Chart>
-      )}
+    <View style={styles.container}>
+      <BeatingHeart frequency={heartFrequency} />
+      <Text style={styles.bpmText}>{`${Math.round(
+        60 * heartFrequency
+      )} bpm`}</Text>
+      <View style={{ flex: 1, flexDirection: "column-reverse" }}>
+        {chartData.length > 1 && (
+          <Chart
+            style={styles.chart}
+            xDomain={xDomain}
+            yDomain={yDomain}
+          >
+            <Line
+              data={chartData}
+              theme={{ stroke: { color: "red", width: 3 } }}
+              smoothing="bezier"
+            />
+          </Chart>
+        )}
+      </View>
     </View>
   )
 }

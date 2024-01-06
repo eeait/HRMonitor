@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Vibration,
 } from "react-native"
 import DataStorageContext from "../dataStorageContext"
 import DataStorage from "../dataStorage"
@@ -48,30 +49,39 @@ const MeasurementList = ({ navigation }) => {
 
   useEffect(() => {
     updateMeasurements()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
-  useEffect(() => {
+    // Subscribe to changes in the data storage
+
     dataStorage.onMeasurementAdded = (newMeasurement) => {
+      // When a new measurement is added:
+      const newTimestamp = Number(newMeasurement[0].timestamp)
       setMeasurements((prevMeasurements) => [
         ...prevMeasurements,
-        Number(newMeasurement[0].timestamp),
+        newTimestamp,
       ])
+      Vibration.vibrate()
+      navigation.navigate("Measurement", {
+        item: newTimestamp,
+      })
     }
+
     dataStorage.onMeasurementRemoved = (removedMeasurement) => {
-      console.log("Measurement removed in ML:", removedMeasurement)
+      // When a measurement is removed:
       setMeasurements((prevMeasurements) =>
         prevMeasurements.filter(
           (measurement) => measurement !== removedMeasurement
         )
       )
     }
+
     dataStorage.onClearMeasurements = () => {
+      // When all measurements are cleared:
       setMeasurements([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // A context value to be passed to the context provider
   const contextValue = useMemo(
     () => ({ measurements, updateMeasurements }),
     [measurements, updateMeasurements]

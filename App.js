@@ -8,6 +8,10 @@ import Measurement from "./src/components/Measurement"
 const Stack = createStackNavigator()
 
 const App = () => (
+  // SafeAreaView is used to avoid the status bar
+  // NavigationContainer is the root component of React Navigation
+  // Stack.Navigator is used to define the navigation stack
+  // Stack.Screen is used to define a screen of the stack
   <SafeAreaView style={{ flex: 1 }}>
     <NavigationContainer>
       <Stack.Navigator>
@@ -19,7 +23,7 @@ const App = () => (
         <Stack.Screen
           name="Measurement"
           component={Measurement}
-          options={{ title: "Measurement Details" }} // And this line
+          options={{ title: "Measurement Results" }} // And this line
         />
       </Stack.Navigator>
     </NavigationContainer>
